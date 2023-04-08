@@ -4,6 +4,7 @@ import Abi from "../../utils/Abi.json";
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import svg64 from 'svg64';
+import Link from 'next/link';
 function LinkCard({
   href,
   title,
@@ -83,7 +84,7 @@ const Post = () => {
     if (address && id && domainowner && !isDisconnected && address === domainowner) {
       setEditbutton(true);
     }
-  }, [sociallinks,domainowner,isDisconnected]);
+  }, [sociallinks, domainowner, isDisconnected]);
   //console.log(sociallinks)
 
   const formattedLinks = Array.isArray(sociallinks) && sociallinks?.map((link, index) => {
@@ -101,15 +102,15 @@ const Post = () => {
     avatar: image,
     links: formattedLinks && formattedLinks,
   }
-  if(!domainexists){
-    return ;
+  if (!domainexists) {
+    return;
   }
   return (
     <div className="flex items-center flex-col mx-auto w-full justify-center mt-16 px-8">
       <Image
         priority
         className="rounded"
-        alt={Array.isArray(data.name) ? data.name.join(' ') : data.name}        src={data.avatar}
+        alt={Array.isArray(data.name) ? data.name.join(' ') : data.name} src={data.avatar}
         width={96}
         height={96}
       />
@@ -117,22 +118,22 @@ const Post = () => {
       {data && Array.isArray(data.links) && data.links?.map((link, i) => (
         <LinkCard key={i} {...link} />
       ))}
-      {editbutton && <a
-        href={`/edit/${id}`}
-        target="_blank"
+      {editbutton && <Link
+        href={`/edit/${id}`}><button
         rel="noopener noreferrer"
         className="flex items-center p-1 w-full rounded-md hover:scale-105 transition-all bg-gray-100 mb-3 max-w-3xl"
       >
-        <div className="flex text-center w-full">
-          <div className="w-10 h-10">
-          </div>
-          <h2 className="flex justify-center items-center font-semibold w-full text-gray-700 -ml-10">
-            Edit Profile
-          </h2>
-        </div>
-      </a>
+          <div className="flex text-center w-full">
+            <div className="w-10 h-10">
+            </div>
+            <h2 className="flex justify-center items-center font-semibold w-full text-gray-700 -ml-10">
+              Edit Profile
+            </h2>
+          </div>      
+      </button>
+      </Link>
       }
-      
+
     </div>
   );
 }
