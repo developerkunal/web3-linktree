@@ -79,6 +79,7 @@ const Post = () => {
     args: [id, socialplatform],
   })
   const { config } = usePrepareSendTransaction({
+    chainId: 80001,
     request: { to: address || '', value: BigNumber.from('5000000000000000000') },
   })
   const {  isSuccess, sendTransaction } =
