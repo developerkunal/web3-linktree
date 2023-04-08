@@ -1,10 +1,11 @@
 import { useRouter } from 'next/router'
-import { useAccount, useContract, useContractRead, useSigner } from 'wagmi'
+import { useAccount, useContract, useContractRead, usePrepareSendTransaction, useSendTransaction, useSigner } from 'wagmi'
 import Abi from "../../utils/Abi.json";
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import svg64 from 'svg64';
 import Link from 'next/link';
+import { BigNumber } from 'ethers';
 function LinkCard({
   href,
   title,
@@ -37,7 +38,7 @@ function LinkCard({
           )}
         </div>
         <h2 className="flex justify-center items-center font-semibold w-full text-gray-700 -ml-10">
-          {title}
+          {title.toUpperCase()}
         </h2>
       </div>
     </a>
@@ -77,6 +78,14 @@ const Post = () => {
     functionName: 'getSocialLinks',
     args: [id, socialplatform],
   })
+  const { config } = usePrepareSendTransaction({
+    request: { to: address || '', value: BigNumber.from('5000000000000000000') },
+  })
+  const {  isSuccess, sendTransaction } =
+    useSendTransaction(config);
+    if(isSuccess){
+      window.alert('Transaction Successfull')
+    }
   useEffect(() => {
     if (sociallinks && Array.isArray(sociallinks) && sociallinks.length === 6) {
       setSociallinks(sociallinks);
@@ -106,8 +115,11 @@ const Post = () => {
     return;
   }
   return (
-    <div className="flex items-center flex-col mx-auto w-full justify-center mt-16 px-8">
-      <Image
+    <div className="h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+    <div className="flex items-center flex-col mx-auto w-full justify-center px-8">
+      <br/>
+
+       <Image
         priority
         className="rounded"
         alt={Array.isArray(data.name) ? data.name.join(' ') : data.name} src={data.avatar}
@@ -118,23 +130,50 @@ const Post = () => {
       {data && Array.isArray(data.links) && data.links?.map((link, i) => (
         <LinkCard key={i} {...link} />
       ))}
+      <Link
+        href={`/tree/${id}/showcase`}><button
+          rel="noopener noreferrer"
+          className="flex items-center p-1 w-full rounded-md hover:scale-105 transition-all bg-gray-100 mb-3 max-w-3xl"
+        >
+          <div className="flex text-center w-full">
+            <div className="w-10 h-10">
+            </div>
+            <h2 className="flex justify-center items-center font-semibold w-full text-gray-700 -ml-10">
+              NFT Showcase
+            </h2>
+          </div>
+        </button>
+      </Link>
+      <button
+        rel="noopener noreferrer"
+        className={`flex items-center p-1 w-full rounded-md hover:scale-105 transition-all ${!sendTransaction ? 'bg-gray-500': 'bg-gray-100'} mb-3 max-w-3xl`} onClick={() => sendTransaction?.()}
+      >
+        <div className="flex text-center w-full">
+          <div className="w-10 h-10">
+          </div>
+          <h2 className="flex justify-center items-center font-semibold w-full text-gray-700 -ml-10">
+            Donate Now - 5 Matic
+          </h2>
+        </div>
+      </button>
       {editbutton && <Link
         href={`/edit/${id}`}><button
-        rel="noopener noreferrer"
-        className="flex items-center p-1 w-full rounded-md hover:scale-105 transition-all bg-gray-100 mb-3 max-w-3xl"
-      >
+          rel="noopener noreferrer"
+          className="flex items-center p-1 w-full rounded-md hover:scale-105 transition-all bg-gray-100 mb-3 max-w-3xl"
+        >
           <div className="flex text-center w-full">
             <div className="w-10 h-10">
             </div>
             <h2 className="flex justify-center items-center font-semibold w-full text-gray-700 -ml-10">
               Edit Profile
             </h2>
-          </div>      
-      </button>
+          </div>
+        </button>
       </Link>
       }
-
     </div>
+    </div>
+
   );
 }
 
