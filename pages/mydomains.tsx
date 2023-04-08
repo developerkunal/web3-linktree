@@ -28,7 +28,7 @@ const Post = () => {
   async function fetchTokenData() {
     if (!linkee || !tokenIDs) return; // Check if linkee or tokenIDs is null before calling functions on it
 
-    async function getTokenURI(tokenId:number) {
+    async function getTokenURI(tokenId: number) {
       if (!linkee) return null; // Check if linkee is null before calling functions on it
       const tokenURI = await linkee?.tokenURI(tokenId);
       return tokenURI;
@@ -42,11 +42,14 @@ const Post = () => {
           return data;
         })
       );
-      const tokenMap = await tokenData?.reduce((acc, data, i) => {
-        acc[tokenIDs[i]] = data;
-        return acc;
-      }, {});
-      setTokens(tokenMap);
+      if (Array.isArray(tokenIDs)) {
+        const tokenids: any[] = tokenIDs
+        const tokenMap = await tokenData?.reduce((acc, data, i) => {
+          acc[tokenids[i]] = data;
+          return acc;
+        }, {});
+        setTokens(tokenMap);
+      }
     }
   }
   useEffect(() => {
@@ -57,13 +60,13 @@ const Post = () => {
     else if (address && signerData && tokenIDs) {
       fetchTokenData();
     }
-  }, [address, signerData ,tokenIDs]);
+  }, [address, signerData, tokenIDs]);
 
   // rest of the component code
   return (
     <div className=" min-h-screen container mx-auto px-4 py-8 bg-gray-100">
       <div className="flex flex-wrap justify-center">
-        {token ? Object.values(token).map((item:any) => (
+        {token ? Object.values(token).map((item: any) => (
 
           <div className="w-full md:w-1/4 p-4" key={item?.name}>
             <article className="rounded-xl border border-gray-700 bg-gray-800 p-4">
