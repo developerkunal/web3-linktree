@@ -13,7 +13,6 @@ const Post = () => {
   const { address, isConnecting, isDisconnected } = useAccount();
   const [token, setTokens] = useState();
   const router = useRouter();
-
   const { data: tokenIDs } = useContractRead({
     address: `0x${process.env.NEXT_PUBLIC_SMART_CONTRACT}`,
     abi: Abi,
@@ -34,7 +33,7 @@ const Post = () => {
       const tokenURI = await linkee?.tokenURI(tokenId);
       return tokenURI;
     }
-    const tokenURIs = await Promise.all(tokenIDs?.map(getTokenURI));
+    const tokenURIs = await Promise.all((tokenIDs as number[])?.map(getTokenURI));
 
     if (tokenURIs) {
       const tokenData = await Promise.all(
