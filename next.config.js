@@ -2,8 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['linktree-nextjs.vercel.app'],
-  },
+    loader: 'akamai',
+    path: '',  },
+    trailingSlash: true,
 };
 
 module.exports = nextConfig;
