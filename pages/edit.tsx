@@ -1,14 +1,14 @@
 import { useRouter } from 'next/router'
-import Abi from "../../utils/Abi.json";
-import { useContract, useContractRead, useSigner, useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
+import Abi from "../utils/Abi.json";
+import { useContractRead, useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { Button } from '@tremor/react';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
 
 const Post = () => {
   const router = useRouter()
-  const { id } = router.query
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { link } = router.query
+  const { address, isDisconnected } = useAccount();
   const [twitterHandle, setTwitterHandle] = useState('');
   const [youtubeHandle, setYoutubeHandle] = useState('');
   const [discordHandle, setDiscordHandle] = useState('');
@@ -28,7 +28,7 @@ const Post = () => {
     abi: Abi,
     chainId: 80001,
     functionName: 'getDomainOwner',
-    args: [id],
+    args: [link],
   })
   
   const { data: sociallinks } = useContractRead({
@@ -36,7 +36,7 @@ const Post = () => {
     abi: Abi,
     chainId: 80001,
     functionName: 'getSocialLinks',
-    args: [id, socialplatform],
+    args: [link, socialplatform],
   })
 
   useEffect(() => {
@@ -48,10 +48,8 @@ const Post = () => {
       setPortfolioLink(sociallinks[4]);
       setWebsiteLink(sociallinks[5]);
     }
-    if (address && id && domainowner && !isDisconnected ) {
-      if (address != domainowner) {
-        router.push('/');
-      }
+    if (!address || !link || !domainowner || isDisconnected || address !== domainowner) {
+      router.push('/');
     }
   }, [sociallinks]);
   const { config } = usePrepareContractWrite({
@@ -59,7 +57,7 @@ const Post = () => {
     abi: Abi,
     functionName: 'addSocialLinks',
     chainId: 80001,
-    args: ([id, socialplatform, [twitterHandle1, youtubeHandle1, discordHandle1, blogLink1, portfolioLink1, websiteLink1]])
+    args: ([link, socialplatform, [twitterHandle1, youtubeHandle1, discordHandle1, blogLink1, portfolioLink1, websiteLink1]])
   })
   const { isSuccess, write } = useContractWrite({
     ...config
@@ -102,7 +100,7 @@ const Post = () => {
         <div className="flex justify-between container mx-auto">
           <div className="w-full">
             <div className="mt-4 px-4">
-              <h1 className="text-3xl font-semibold py-7 px-5">Edit {id} Linktree</h1>
+              <h1 className="text-3xl font-semibold py-7 px-5">Edit {link} Linktree</h1>
               <form className="mx-5 my-5" onSubmit={handleSubmit}>
 
                 <div className="mt-5">
@@ -143,7 +141,7 @@ const Post = () => {
                 </div>
                 <label className="relative block p-2 border-2 mt-5 border-black rounded" htmlFor="name">
                   <span className="text-md font-semibold text-zinc-900" >
-                    Blog Link
+                    Blog link
                   </span>
 
                   <input className="w-full   p-0 text-sm border-none bg-transparent text-gray-500 focus:outline-none" id="name" type="text" placeholder="Enter Your Blog URL" value={blogLink} onChange={(event) => setBlogLink(event.target.value)} />

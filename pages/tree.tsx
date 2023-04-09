@@ -1,11 +1,12 @@
 import { useRouter } from 'next/router'
 import { useAccount, useContract, useContractRead, usePrepareSendTransaction, useSendTransaction, useSigner } from 'wagmi'
-import Abi from "../../utils/Abi.json";
+import Abi from "../utils/Abi.json";
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import svg64 from 'svg64';
 import Link from 'next/link';
 import { BigNumber } from 'ethers';
+import Head from 'next/head';
 function LinkCard({
   href,
   title,
@@ -51,7 +52,7 @@ interface Link {
 }
 const Post = () => {
   const router = useRouter()
-  const { id } = router.query
+  const { link } = router.query
   const { data: signerData } = useSigner();
   const [sociallink, setSociallinks] = useState<string[]>([]);
   const { address, isConnecting, isDisconnected } = useAccount();
@@ -62,21 +63,21 @@ const Post = () => {
     abi: Abi,
     chainId: 80001,
     functionName: 'getDomainOwner',
-    args: [id],
+    args: [link],
   })
   const { data: domainexists } = useContractRead({
     address: `0x${process.env.NEXT_PUBLIC_SMART_CONTRACT}`,
     abi: Abi,
     chainId: 80001,
     functionName: 'domainExistsMap',
-    args: [id],
+    args: [link],
   })
   const { data: sociallinks } = useContractRead({
     address: `0x${process.env.NEXT_PUBLIC_SMART_CONTRACT}`,
     abi: Abi,
     chainId: 80001,
     functionName: 'getSocialLinks',
-    args: [id, socialplatform],
+    args: [link, socialplatform],
   })
   const { config } = usePrepareSendTransaction({
     chainId: 80001,
@@ -91,7 +92,7 @@ const Post = () => {
     if (sociallinks && Array.isArray(sociallinks) && sociallinks.length === 6) {
       setSociallinks(sociallinks);
     }
-    if (address && id && domainowner && !isDisconnected && address === domainowner) {
+    if (address && link && domainowner && !isDisconnected && address === domainowner) {
       setEditbutton(true);
     }
   }, [sociallinks, domainowner, isDisconnected]);
@@ -105,10 +106,10 @@ const Post = () => {
     avatar:'https://linktree-nextjs.vercel.app/_next/image?url=https%3A%2F%2Fpbs.twimg.com%2Fprofile_images%2F1587647097670467584%2FadWRdqQ6_400x400.jpg&w=96&q=75',
     links:[href :sociallink,]
   } */
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="720" height="720"><rect width="100%" height="100%"/><svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" version="1.2" viewBox="-200 -50 1000 1000"><path fill="#FFFFFF" d="M264.5 190.5c0-13.8 11.2-25 25-25H568c13.8 0 25 11.2 25 25v490c0 13.8-11.2 25-25 25H289.5c-13.8 0-25-11.2-25-25z"/><path fill="#FFFFFF" d="M265 624c0-13.8 11.2-25 25-25h543c13.8 0 25 11.2 25 25v56.5c0 13.8-11.2 25-25 25H290c-13.8 0-25-11.2-25-25z"/></svg><text x="30" y="670" style="font: 60px sans-serif;fill:#fff">${id}</text></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="720" height="720"><rect width="100%" height="100%"/><svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" version="1.2" viewBox="-200 -50 1000 1000"><path fill="#FFFFFF" d="M264.5 190.5c0-13.8 11.2-25 25-25H568c13.8 0 25 11.2 25 25v490c0 13.8-11.2 25-25 25H289.5c-13.8 0-25-11.2-25-25z"/><path fill="#FFFFFF" d="M265 624c0-13.8 11.2-25 25-25h543c13.8 0 25 11.2 25 25v56.5c0 13.8-11.2 25-25 25H290c-13.8 0-25-11.2-25-25z"/></svg><text x="30" y="670" style="font: 60px sans-serif;fill:#fff">${link}</text></svg>`;
   const image = svg64(svg);
   const data = {
-    name: id,
+    name: link,
     avatar: image,
     links: formattedLinks && formattedLinks,
   }
@@ -117,6 +118,9 @@ const Post = () => {
   }
   return (
     <div className="h-screen bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">
+      <Head>
+        <title>{link} LinkTree</title>
+      </Head>
     <div className="flex items-center flex-col mx-auto w-full justify-center px-8">
       <br/>
 
@@ -127,12 +131,12 @@ const Post = () => {
         width={96}
         height={96}
       />
-      <h1 className="font-bold mt-4 mb-8 text-xl text-white">{id}</h1>
+      <h1 className="font-bold mt-4 mb-8 text-xl text-white">{link}</h1>
       {data && Array.isArray(data.links) && data.links?.map((link, i) => (
         <LinkCard key={i} {...link} />
       ))}
       <Link
-        href={`/tree/${id}/showcase`}><button
+        href={`/showcase?link=${link}`}><button
           rel="noopener noreferrer"
           className="flex items-center p-1 w-full rounded-md hover:scale-105 transition-all bg-gray-100 mb-3 max-w-3xl"
         >
@@ -158,7 +162,7 @@ const Post = () => {
         </div>
       </button>
       {editbutton && <Link
-        href={`/edit/${id}`}><button
+        href={`/edit?link=${link}`}><button
           rel="noopener noreferrer"
           className="flex items-center p-1 w-full rounded-md hover:scale-105 transition-all bg-gray-100 mb-3 max-w-3xl"
         >

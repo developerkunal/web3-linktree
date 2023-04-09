@@ -145,7 +145,7 @@ const Home: NextPage = () => {
             Visit Domain
           </div>
           <div className="border border-t-0 border-green-400 rounded-b bg-green-100 px-4 py-3 text-green-700">
-            <p>You can visit domain here on <Link href={`/tree/${query.toLowerCase()}`}>{query.toLowerCase()}</Link></p>
+            <p>You can visit domain here on <Link href={`/tree?link=${query.toLowerCase()}`}>{query.toLowerCase()}</Link></p>
           </div>
         </div>}
         

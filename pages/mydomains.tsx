@@ -64,7 +64,9 @@ const Post = () => {
 
   // rest of the component code
   return (
+
     <div className=" min-h-screen container mx-auto px-4 py-8 bg-gray-100">
+
       <div className="flex flex-wrap justify-center">
         {token ? Object.values(token).map((item: any) => (
 
@@ -87,7 +89,7 @@ const Post = () => {
               </div>
 
               <ul className="mt-4 space-y-2">
-                <li><Link href={`/edit/${item?.name}`}>
+                <li><Link href={`/edit?link=${item?.name}`}>
                   <a
                     className="block h-full rounded-lg border border-gray-700 p-2 hover:border-pink-600"
                   >
@@ -97,7 +99,7 @@ const Post = () => {
                 </Link>
                 </li>
 
-                <li><Link href={`/tree/${item?.name}`}>
+                <li><Link href={`/tree?link=${item?.name}`}>
                   <a
                     className="block h-full rounded-lg border border-gray-700 p-2 hover:border-pink-600"
                   >

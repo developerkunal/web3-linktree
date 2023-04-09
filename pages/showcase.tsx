@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { useAccount, useContract, useContractRead, useSigner } from 'wagmi'
-import Abi from "../../../utils/Abi.json";
+import Abi from "../utils/Abi.json";
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import svg64 from 'svg64';
@@ -59,7 +59,7 @@ const NFTCard = ({ nft }: Props) => {
 };
 const Post = () => {
     const router = useRouter()
-    const { id } = router.query
+    const { link } = router.query
     const PAGE_SIZE = 6;
     const socialplatform = ["twitter", "youtube", "discord", "blog", "portfolio", "website"];
     const [loading, setLoading] = useState(true);
@@ -71,14 +71,14 @@ const Post = () => {
         abi: Abi,
         chainId: 80001,
         functionName: 'getDomainOwner',
-        args: [id],
+        args: [link],
     })
     const { data: domainexists } = useContractRead({
         address: `0x${process.env.NEXT_PUBLIC_SMART_CONTRACT}`,
         abi: Abi,
         chainId: 80001,
         functionName: 'domainExistsMap',
-        args: [id],
+        args: [link],
     })
     useEffect(() => {
         if (domainexists && domainowner) {
