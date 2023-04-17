@@ -1,28 +1,5 @@
 [
 	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_domain",
-				"type": "string"
-			},
-			{
-				"internalType": "string[]",
-				"name": "_platforms",
-				"type": "string[]"
-			},
-			{
-				"internalType": "string[]",
-				"name": "_links",
-				"type": "string[]"
-			}
-		],
-		"name": "addSocialLinks",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
 		"inputs": [],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
@@ -98,14 +75,9 @@
 	{
 		"inputs": [
 			{
-				"internalType": "string",
-				"name": "_domain",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_uri",
-				"type": "string"
+				"internalType": "uint256",
+				"name": "tokenId",
+				"type": "uint256"
 			}
 		],
 		"name": "mint",
@@ -131,24 +103,6 @@
 		],
 		"name": "OwnershipTransferred",
 		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_domain",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_platform",
-				"type": "string"
-			}
-		],
-		"name": "removeSocialLink",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
 	},
 	{
 		"inputs": [],
@@ -199,7 +153,7 @@
 			},
 			{
 				"internalType": "bytes",
-				"name": "_data",
+				"name": "data",
 				"type": "bytes"
 			}
 		],
@@ -222,6 +176,19 @@
 			}
 		],
 		"name": "setApprovalForAll",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_baseURI",
+				"type": "string"
+			}
+		],
+		"name": "setBaseURI",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -308,31 +275,12 @@
 	},
 	{
 		"inputs": [],
-		"name": "counter",
+		"name": "baseURI",
 		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
 			{
 				"internalType": "string",
-				"name": "_domain",
-				"type": "string"
-			}
-		],
-		"name": "domainExistsMap",
-		"outputs": [
-			{
-				"internalType": "bool",
 				"name": "",
-				"type": "bool"
+				"type": "string"
 			}
 		],
 		"stateMutability": "view",
@@ -352,130 +300,6 @@
 				"internalType": "address",
 				"name": "",
 				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_domain",
-				"type": "string"
-			}
-		],
-		"name": "getDomainOwner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_owner",
-				"type": "address"
-			}
-		],
-		"name": "getOwnerDomains",
-		"outputs": [
-			{
-				"internalType": "string[]",
-				"name": "",
-				"type": "string[]"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_domain",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "_platform",
-				"type": "string"
-			}
-		],
-		"name": "getSocialLink",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "_domain",
-				"type": "string"
-			},
-			{
-				"internalType": "string[]",
-				"name": "_platforms",
-				"type": "string[]"
-			}
-		],
-		"name": "getSocialLinks",
-		"outputs": [
-			{
-				"internalType": "string[]",
-				"name": "",
-				"type": "string[]"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenid",
-				"type": "uint256"
-			}
-		],
-		"name": "getTokenidDomain",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_user",
-				"type": "address"
-			}
-		],
-		"name": "getUserTokenIds",
-		"outputs": [
-			{
-				"internalType": "uint256[]",
-				"name": "",
-				"type": "uint256[]"
 			}
 		],
 		"stateMutability": "view",
@@ -603,7 +427,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "totalSupply",
+		"name": "totalTokens",
 		"outputs": [
 			{
 				"internalType": "uint256",

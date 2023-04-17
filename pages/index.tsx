@@ -4,21 +4,23 @@ import { useState } from 'react';
 import link from './link.svg'
 import Image from 'next/image'
 import Abi from '../utils/Abi.json'
-import { useContract, useContractRead, useSigner, useAccount } from 'wagmi';
+import { useContract, useSigner, useAccount } from 'wagmi';
 import Link from 'next/link';
 import Popup from '../components/Popup'
-import svg64 from 'svg64';
+import { checkAvailable, createNFT } from '../utils/polybase';
+import { getUploadToken } from '../utils/spheron';
 
 const Home: NextPage = () => {
   const [query, setQuery] = useState('');
   const [domainAvailable, setDomainAvailable] = useState(false);
-  const { address, isConnecting, isDisconnected } = useAccount();
+  const { address, isDisconnected } = useAccount();
   const { data: signerData } = useSigner();
   const [error, setError] = useState('');
   const [isOpen, setIsOpen] = useState(false)
-  const openPopup = () => setIsOpen(true)
   const closePopup = () => setIsOpen(false)
   const [isLoading, setIsLoading] = useState(false);
+
+
   const linkee = useContract({
     address: `0x${process.env.NEXT_PUBLIC_SMART_CONTRACT}`,
     abi: Abi,
@@ -30,7 +32,7 @@ const Home: NextPage = () => {
   };
   const checkDomainAvailability = async (name: string) => {
     if (isLink(name)) {
-      const read = await linkee?.domainExistsMap(name.toLowerCase());
+      const read = await checkAvailable(name.toLowerCase());
       setDomainAvailable(read);
       setError("");
     }
@@ -39,37 +41,22 @@ const Home: NextPage = () => {
       setError(`Domain does't end with .link`);
     }
   };
+
   const handleQueryChange = (event: { target: { value: any; }; }) => {
 
     checkDomainAvailability(event.target.value);
     setQuery(event.target.value);
 
   };
-
   const handleSubmit = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
     try {
       if (query && linkee && address) {
         if (isLink(query)) {
           setIsLoading(true);
-          const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="720" height="720"><rect width="100%" height="100%"/><svg xmlns="http://www.w3.org/2000/svg" width="150" height="150" version="1.2" viewBox="-200 -50 1000 1000"><path fill="#FFFFFF" d="M264.5 190.5c0-13.8 11.2-25 25-25H568c13.8 0 25 11.2 25 25v490c0 13.8-11.2 25-25 25H289.5c-13.8 0-25-11.2-25-25z"/><path fill="#FFFFFF" d="M265 624c0-13.8 11.2-25 25-25h543c13.8 0 25 11.2 25 25v56.5c0 13.8-11.2 25-25 25H290c-13.8 0-25-11.2-25-25z"/></svg><text x="30" y="670" style="font: 60px sans-serif;fill:#fff">${query}</text></svg>`;
-          const image = svg64(svg);
-
-          const json = {
-            "name": query,
-            "description": "A Link domain. Use it to resolve your Linktree.",
-            "image": image,
-            "image_url": image,
-            "attributes": [
-              {
-                "trait_type": "Ending",
-                "value": "link"
-              },
-            ]
-          }
-          const jsonString = JSON.stringify(json);
-          const base64 = Buffer.from(jsonString).toString('base64');
-          await linkee?.mint(query, `data:application/json;base64,${base64}`);
+          const imageurl = await getUploadToken(query);
+          const data =await createNFT(query,'A Link domain. Use it to resolve your Linktree.',imageurl || '',`${address}`,query);
+          await linkee?.mint(parseInt(data?.id));
           setIsLoading(false);
           setIsOpen(true);
         }
@@ -82,7 +69,9 @@ const Home: NextPage = () => {
       console.log(err);
     }
   };
-
+  const upload = async () =>{
+    await getUploadToken('kunal.link');
+  }
   return (
     <div className="min-h-screen bg-gray-100">
       <Head>
@@ -148,7 +137,7 @@ const Home: NextPage = () => {
             <p>You can visit domain here on <Link href={`/tree?link=${query.toLowerCase()}`}>{query.toLowerCase()}</Link></p>
           </div>
         </div>}
-        
+    
         <Popup isOpen={isOpen} domain={query} onClose={closePopup} />
         <p className="text-gray-600 text-lg mb-4">
           This is a Linkee website where you can find all my important links in one place. Just type a domain name with

@@ -1,9 +1,10 @@
 import { useRouter } from 'next/router'
-import Abi from "../utils/Abi.json";
-import { useContractRead, useAccount, useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useAccount } from "wagmi";
 import { Button } from '@tremor/react';
 import Head from 'next/head';
 import { useEffect, useState } from 'react';
+import { AddLinks, checkDomainOwner, fetchDomain } from '../utils/polybase';
+import { CollectionRecordResponse } from '@polybase/client/dist/types';
 
 const Post = () => {
   const router = useRouter()
@@ -15,59 +16,52 @@ const Post = () => {
   const [blogLink, setBlogLink] = useState('');
   const [portfolioLink, setPortfolioLink] = useState('');
   const [websiteLink, setWebsiteLink] = useState('');
-  const [twitterHandle1, setTwitterHandle1] = useState('');
-  const [youtubeHandle1, setYoutubeHandle1] = useState('');
-  const [discordHandle1, setDiscordHandle1] = useState('');
-  const [blogLink1, setBlogLink1] = useState('');
-  const [portfolioLink1, setPortfolioLink1] = useState('');
-  const [websiteLink1, setWebsiteLink1] = useState('');
   const socialplatform = ["twitter", "youtube", "discord", "blog", "portfolio", "website"];
-  const [isWriting, setIsWriting] = useState(false);  
-  const { data: domainowner } = useContractRead({
-    address: `0x${process.env.NEXT_PUBLIC_SMART_CONTRACT}`,
-    abi: Abi,
-    chainId: 80001,
-    functionName: 'getDomainOwner',
-    args: [link],
-  })
-  
-  const { data: sociallinks } = useContractRead({
-    address: `0x${process.env.NEXT_PUBLIC_SMART_CONTRACT}`,
-    abi: Abi,
-    chainId: 80001,
-    functionName: 'getSocialLinks',
-    args: [link, socialplatform],
-  })
+  const [domainowner, setDOmainowner] = useState(false);
+  const [domaindata, setDomaindata] = useState<CollectionRecordResponse<any>[]>([]);
+
+  const socialLinks = domaindata[0]?.data?.links; // assuming `data` is the array you receive with the API response
 
   useEffect(() => {
-    if (sociallinks && Array.isArray(sociallinks) && sociallinks.length === 6) {
-      setTwitterHandle(sociallinks[0]?.substring(20));
-      setYoutubeHandle(sociallinks[1]?.substring(20));
-      setDiscordHandle(sociallinks[2]?.substring(19));
-      setBlogLink(sociallinks[3]);
-      setPortfolioLink(sociallinks[4]);
-      setWebsiteLink(sociallinks[5]);
+    if (socialLinks) {
+      setTwitterHandle(socialLinks["twitter"]?.substring(20));
+      setYoutubeHandle(socialLinks["youtube"]?.substring(20));
+      setDiscordHandle(socialLinks["discord"]?.substring(19));
+      setBlogLink(socialLinks["blog"]);
+      setPortfolioLink(socialLinks["portfolio"]);
+      setWebsiteLink(socialLinks["website"]);
     }
-    if (!address || !link || !domainowner || isDisconnected || address !== domainowner) {
-      router.push('/');
-    }
-  }, [sociallinks]);
-  const { config } = usePrepareContractWrite({
-    address: `0x${process.env.NEXT_PUBLIC_SMART_CONTRACT}`,
-    abi: Abi,
-    functionName: 'addSocialLinks',
-    chainId: 80001,
-    args: ([link, socialplatform, [twitterHandle1, youtubeHandle1, discordHandle1, blogLink1, portfolioLink1, websiteLink1]])
-  })
-  const { isSuccess, write } = useContractWrite({
-    ...config
-  })
+  }, [socialLinks]);
+
   useEffect(() => {
-    if (twitterHandle!=null && youtubeHandle!=null && discordHandle!=null && blogLink!=null && portfolioLink!=null && websiteLink!=null && isWriting) {
-      write?.();
-      setIsWriting(false);
+    async function checkdomain() {
+      if (typeof link === "string") {
+        const data = await checkDomainOwner(`${address}`, link);
+        setDOmainowner(data);
+      }
     }
-  }, [twitterHandle, youtubeHandle, discordHandle, blogLink, portfolioLink, websiteLink, isWriting]);
+    async function setData() {
+      if (typeof link === "string") {
+        const data = await fetchDomain(link);
+        setDomaindata(data);
+      }
+    }
+    async function checkAndRedirect() {
+      if (typeof link === "string") {
+        const isConnected = !isDisconnected;
+        const domainowner = await checkDomainOwner(`${address}`, link);
+        const shouldRedirect = !address || !link || !domainowner || !isConnected;
+        if (shouldRedirect) {
+          await router.push('/');
+        }
+      }
+    }
+    if (address && link) {
+      checkdomain()
+      setData()
+    }
+    checkAndRedirect()
+  }, [domainowner, isDisconnected, address, link]);
 
   async function handleSubmit(event: { preventDefault: () => void; }) {
     event.preventDefault();
@@ -78,18 +72,12 @@ const Post = () => {
     const blog = blogLink ? blogLink.replace(/^(https?:\/\/)?/i, 'https://') : '';
     const portfolio = portfolioLink ? portfolioLink.replace(/^(https?:\/\/)?/i, 'https://') : '';
     const website = websiteLink ? websiteLink.replace(/^(https?:\/\/)?/i, 'https://') : '';
-
-    setTwitterHandle1(twitter);
-    setYoutubeHandle1(youtube);
-    setDiscordHandle1(discord);
-    setBlogLink1(blog);
-    setPortfolioLink1(portfolio);
-    setWebsiteLink1(website);
-    setIsWriting(true);
+    const id = domaindata[0]?.data?.id;
+    if (id) {
+      const response = await AddLinks(id, socialplatform, [twitter, youtube, discord, blog, portfolio, website]);
+      console.log(response);
     }
-    if(isSuccess){
-      router.reload();
-    }
+  }
   return (
     <div className="min-h-screen bg-gray-100">
       <Head>
@@ -167,7 +155,7 @@ const Post = () => {
                 <Button className="mt-5 border-2 px-5 py-2 rounded-lg border-black border-b-4 font-black translate-y-2 border-l-4">
                   Submit
                 </Button>
-               
+
               </form>
             </div>
           </div>
@@ -180,3 +168,11 @@ const Post = () => {
 }
 
 export default Post
+
+function setDomaindata(data: import("@polybase/client").CollectionRecordResponse<any>[]) {
+  throw new Error('Function not implemented.');
+}
+function setEditbutton(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
+

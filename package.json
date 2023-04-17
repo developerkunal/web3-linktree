@@ -11,8 +11,12 @@
   "dependencies": {
     "@arcana/auth-wagmi": "^0.0.4",
     "@heroicons/react": "^1.0.6",
+    "@polybase/auth": "^0.3.39",
+    "@polybase/client": "^0.3.39",
+    "@polybase/react": "^0.3.39",
     "@rainbow-me/rainbowkit": "^0.12.6",
-    "@spheron/storage": "^1.0.9",
+    "@spheron/browser-upload": "^1.0.0",
+    "@spheron/storage": "^1.0.13",
     "@tremor/react": "^2.1.0",
     "ethers": "^5.0.0",
     "next": "^12.1.6",

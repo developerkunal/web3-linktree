@@ -1,11 +1,8 @@
 import { useRouter } from 'next/router'
-import { useAccount, useContract, useContractRead, useSigner } from 'wagmi'
-import Abi from "../utils/Abi.json";
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
-import svg64 from 'svg64';
-import Link from 'next/link';
 import Head from 'next/head';
+import { checkAvailable, fetchDomain } from '../utils/polybase';
+import { CollectionRecordResponse } from '@polybase/client/dist/types';
 interface Props {
     nft: Nft;
 }
@@ -61,53 +58,58 @@ const Post = () => {
     const router = useRouter()
     const { link } = router.query
     const PAGE_SIZE = 6;
-    const socialplatform = ["twitter", "youtube", "discord", "blog", "portfolio", "website"];
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [nfts, setNFTs] = useState([]);
-    const { data: domainowner } = useContractRead({
-        address: `0x${process.env.NEXT_PUBLIC_SMART_CONTRACT}`,
-        abi: Abi,
-        chainId: 80001,
-        functionName: 'getDomainOwner',
-        args: [link],
-    })
-    const { data: domainexists } = useContractRead({
-        address: `0x${process.env.NEXT_PUBLIC_SMART_CONTRACT}`,
-        abi: Abi,
-        chainId: 80001,
-        functionName: 'domainExistsMap',
-        args: [link],
-    })
+    const [domaindata, setDomaindata] = useState<CollectionRecordResponse<any>[]>([]);
+
     useEffect(() => {
-        if (domainexists && domainowner) {
-            const options = { method: 'GET', headers: { accept: 'application/json', Authorization: process.env.NEXT_PUBLIC_NFTPORT || '' } };
-            fetch(`https://api.nftport.xyz/v0/accounts/${domainowner}?chain=polygon&page_size=50&include=metadata`, options)
-                .then(response => response.json())
-                .then(response => {
-                    console.log(response)
-                    setTotalPages(Math.ceil(response.total / PAGE_SIZE));
-                    setNFTs(response.nfts
-                    )
-                })
-                .catch(err => console.error(err));
-            setLoading(false);
+        async function checkAvailabilityAndRedirect() {
+            if (typeof link === "string" && domaindata?.[0]?.data?.address) {
+                console.log(await checkAvailable(link));
+                if (await checkAvailable(link)) {
+                    const options = { method: 'GET', headers: { accept: 'application/json', Authorization: process.env.NEXT_PUBLIC_NFTPORT || '' } };
+                    fetch(`https://api.nftport.xyz/v0/accounts/${domaindata[0]?.data?.address}?chain=polygon&page_size=50&include=metadata`, options)
+                        .then(response => response.json())
+                        .then(response => {
+                            console.log(response)
+                            setTotalPages(Math.ceil(response.total / PAGE_SIZE));
+                            setNFTs(response.nfts);
+                        })
+                        .catch(err => console.error(err));
+                    setLoading(false);
+                } else {
+                    router.push('/');
+                }
+            }
         }
-    }, [domainexists, domainowner]);
+
+        checkAvailabilityAndRedirect();
+    }, [link, domaindata]);
+
+    useEffect(() => {
+        async function setData() {
+            if (typeof link === "string") {
+                const data = await fetchDomain(link);
+                setDomaindata(data);
+            }
+        }
+        setData();
+    }, [link]);
     const startIndex = (currentPage - 1) * PAGE_SIZE;
     const endIndex = startIndex + PAGE_SIZE;
     const currentPageData = nfts?.slice(startIndex, endIndex);
     const handleNextPage = () => {
-        setCurrentPage((prevPage) => prevPage + 1);
+        const totalPages = Math.ceil(nfts.length / PAGE_SIZE);
+        if (currentPage < totalPages) {
+            setCurrentPage((prevPage) => prevPage + 1);
+        }
     };
 
     const handlePrevPage = () => {
         setCurrentPage((prevPage) => prevPage - 1);
     };
-    if (!domainexists) {
-        return;
-    }
     if (loading || !nfts) {
         return (
             <section className="bg-white dark:bg-gray-900">
@@ -192,22 +194,22 @@ const Post = () => {
                         {currentPageData && (currentPageData as Nft[]).map((nft: Nft) => (
                             <NFTCard key={nft.token_id} nft={nft} />
                         ))}
-                       
+
                     </div>
                     <button
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
-                            disabled={currentPage === 1}
-                            onClick={handlePrevPage}
-                        >
-                            Previous
-                        </button>
-                        <button
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                            disabled={currentPage === totalPages}
-                            onClick={handleNextPage}
-                        >
-                            Next
-                        </button>
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+                        disabled={currentPage === 1}
+                        onClick={handlePrevPage}
+                    >
+                        Previous
+                    </button>
+                    <button
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        disabled={currentPage === totalPages}
+                        onClick={handleNextPage}
+                    >
+                        Next
+                    </button>
                 </section>
             </div>
         </div>
