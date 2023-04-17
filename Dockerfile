@@ -27,6 +27,8 @@ COPY . .
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
 
+ENV NEXT_PUBLIC_SMART_CONTRACT eef8d2218f84987d52ebe025e651e48e46445206
+
 # RUN yarn build
 
 # If using npm comment out above and use below instead
