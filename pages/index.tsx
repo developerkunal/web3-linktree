@@ -69,9 +69,6 @@ const Home: NextPage = () => {
       console.log(err);
     }
   };
-  const upload = async () =>{
-    await getUploadToken('kunal.link');
-  }
   return (
     <div className="min-h-screen bg-gray-100">
       <Head>
