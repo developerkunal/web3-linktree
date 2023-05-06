@@ -1,29 +1,50 @@
-This is a [RainbowKit](https://rainbowkit.com) + [wagmi](https://wagmi.sh) + [Next.js](https://nextjs.org/) project bootstrapped with [`create-rainbowkit`](https://github.com/rainbow-me/rainbowkit/tree/main/packages/create-rainbowkit).
+# Web3 Linktree
+
+This project is a Web3-based linktree built using Next.js, Polybase, Spheron, and Shardeum Network. The application allows users to mint domain names and create their own linktree-style landing pages with personalized links.
 
 ## Getting Started
 
-First, run the development server:
+To run this project locally, first clone the repository:
+
+```bash
+git clone https://github.com/developerkunal/web3-linktree.git
+```
+
+Next, navigate to the project directory and install the necessary dependencies:
+
+```bash
+cd web3-linktree
+npm install
+```
+
+To start the application, run:
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This will start the development server on `http://localhost:3000`.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Features
 
-## Learn More
+- Mint domain names
+- Create personalized linktrees
+- Support for Polybase, Spheron, and Shardeum Network
+- Gas-less minting for domain names
 
-To learn more about this stack, take a look at the following resources:
+## Technologies Used
 
-- [RainbowKit Documentation](https://rainbowkit.com) - Learn how to customize your wallet connection flow.
-- [wagmi Documentation](https://wagmi.sh) - Learn how to interact with Ethereum.
-- [Next.js Documentation](https://nextjs.org/docs) - Learn how to build a Next.js application.
+- Next.js
+- React.js
+- Web3.js
+- Polybase
+- Spheron
+- Shardeum Network
 
-You can check out [the RainbowKit GitHub repository](https://github.com/rainbow-me/rainbowkit) - your feedback and contributions are welcome!
+## Contributing
 
-## Deploy on Vercel
+If you would like to contribute to this project, please open a pull request. All contributions are welcome!
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## License
 
-Check out the [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+This project is licensed under the MIT License. See the `LICENSE` file for more information.

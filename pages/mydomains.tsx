@@ -4,22 +4,37 @@ import { useSigner, useAccount } from "wagmi";
 import Link from "next/link";
 import { listRecordsWithFilter } from "../utils/polybase";
 import { CollectionRecordResponse } from "@polybase/client/dist/types";
+import { useContract } from 'wagmi';
+import Abi from '../utils/Abi.json'
 
 const Post = () => {
   const { data: signerData } = useSigner();
   const { address, isConnecting, isDisconnected } = useAccount();
   const [tokens, setTokens] = useState<CollectionRecordResponse<any>[]>([]);
   const router = useRouter();
-  
+  const linkee = useContract({
+    address: `0x${process.env.NEXT_PUBLIC_SMART_CONTRACT}`,
+    abi: Abi,
+    signerOrProvider: signerData,
+  });
+  async function checkDomainAvailable(id: string) {
+    const response = await linkee?.isTokenMinted(parseInt(id));
+    if (response) {
+      alert("Domain has been already Minted");
+    }
+    else {
+      await linkee?.mint(id);
+    }
+  }
   useEffect(() => {
-    async function fetchdata(){
-     const data = await listRecordsWithFilter(`${address}`);
-     setTokens(data);
+    async function fetchdata() {
+      const data = await listRecordsWithFilter(`${address}`);
+      setTokens(data);
     }
     if (!address && !isConnecting && isDisconnected) {
       router.push('/');
     }
-    else if (address && signerData) { 
+    else if (address && signerData) {
       fetchdata()
     }
   }, [address, signerData]);
@@ -51,6 +66,15 @@ const Post = () => {
               </div>
 
               <ul className="mt-4 space-y-2">
+              <li>  <button className="block h-full rounded-lg border border-gray-700 p-2 hover:border-pink-600" onClick={() => checkDomainAvailable(item.data.id)}>
+                  <a
+                    
+                  >
+                    <strong className="font-medium text-white">Mint</strong>
+
+                  </a>
+                </button>
+                </li>
                 <li><Link href={`/edit?link=${item.data.domainname}`}>
                   <a
                     className="block h-full rounded-lg border border-gray-700 p-2 hover:border-pink-600"
@@ -60,7 +84,7 @@ const Post = () => {
                   </a>
                 </Link>
                 </li>
-
+                
                 <li><Link href={`/tree?link=${item.data.domainname}`}>
                   <a
                     className="block h-full rounded-lg border border-gray-700 p-2 hover:border-pink-600"
