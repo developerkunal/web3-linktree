@@ -55,10 +55,16 @@ const Home: NextPage = () => {
         if (isLink(query)) {
           setIsLoading(true);
           const imageurl = await getUploadToken(query);
-          const data =await createNFT(query,'A Link domain. Use it to resolve your Linktree.',imageurl || '',`${address}`,query);
-          await linkee?.mint(parseInt(data?.id));
-          setIsLoading(false);
-          setIsOpen(true);
+          const data = await createNFT(query, 'A Link domain. Use it to resolve your Linktree.', imageurl || '', `${address}`, query);
+          try {
+            await linkee?.mint(parseInt(data?.id));
+            setIsLoading(false);
+            setIsOpen(true);
+          } catch (error) {
+            setIsLoading(false);
+            alert("Domain Minting Failed OnChain");
+            setIsOpen(true);
+          }
         }
         else {
           setError(`Domain Doesn't have .Link extension to mint`);
@@ -111,13 +117,13 @@ const Home: NextPage = () => {
           >
             Mint
           </button>}
-          
+
         </form>
         <div className="flex justify-center items-center">
 
-        <button className='bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300' disabled={!linkee || isDisconnected}>
-         <Link href={isDisconnected ? '': '/mydomains'} >My Domains</Link></button>
-         </div>
+          <button className='bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded focus:outline-none focus:ring focus:border-blue-300' disabled={!linkee || isDisconnected}>
+            <Link href={isDisconnected ? '' : '/mydomains'} >My Domains</Link></button>
+        </div>
         {error != "" && <div role="alert">
           <div className="bg-red-500 text-white font-bold rounded-t px-4 py-2">
             Error
@@ -134,7 +140,7 @@ const Home: NextPage = () => {
             <p>You can visit domain here on <Link href={`/tree?link=${query.toLowerCase()}`}>{query.toLowerCase()}</Link></p>
           </div>
         </div>}
-    
+
         <Popup isOpen={isOpen} domain={query} onClose={closePopup} />
         <p className="text-gray-600 text-lg mb-4">
           This is a Linkee website where you can find all my important links in one place. Just type a domain name with
